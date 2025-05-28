@@ -1,0 +1,83 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:-finalwork}
+
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-j+%zq1fdk%q1wpt1k2k6580c_u$hj$5st#fnso3ajx!&(pvu1*}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      POSTGRES_DB: ${POSTGRES_DB:-finalwork}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-5432}
+      POSTGRES_HOST: db
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+
+  celery_worker:
+    build: .
+    command: celery -A config worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+      - db
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-j+%zq1fdk%q1wpt1k2k6580c_u$hj$5st#fnso3ajx!&(pvu1*}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      POSTGRES_DB: ${POSTGRES_DB:-finalwork}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-5432}
+      POSTGRES_HOST: db
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+      CELERY_APP: config  # Укажите имя модуля, где находится ваше приложение Celery
+
+  celery_beat:
+    build: .
+    command: celery -A config beat -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+      - db
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-j+%zq1fdk%q1wpt1k2k6580c_u$hj$5st#fnso3ajx!&(pvu1*}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      POSTGRES_DB: ${POSTGRES_DB:-finalwork}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-5432}
+      POSTGRES_HOST: db
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+      CELERY_APP: config  # Укажите имя модуля, где находится ваше приложение Celery
+
+volumes:
+  db_data:
+  redis_data:
