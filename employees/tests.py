@@ -27,7 +27,8 @@ class EmployeeModelValidationTests(APITestCase):
     def test_valid_employee(self):
         """
         Проверяет, что валидный объект Employee проходит валидацию.
-        Создаем объект Employee с корректными данными и проверяем, что вызов full_clean() не вызывает исключение ValidationError.
+        Создаем объект Employee с корректными данными и проверяем,
+        что вызов full_clean() не вызывает исключение ValidationError.
         """
         employee = Employee(
             full_name="Иванов Иван",
@@ -42,8 +43,10 @@ class EmployeeModelValidationTests(APITestCase):
 
     def test_invalid_email(self):
         """
-        Проверяет, что объект Employee с некорректным email не проходит валидацию.
-        Создаем объект Employee с некорректным email и проверяем, что вызов full_clean() вызывает исключение ValidationError.
+        Проверяет, что объект Employee с некорректным email
+        не проходит валидацию.
+        Создаем объект Employee с некорректным email и проверяем,
+        что вызов full_clean() вызывает исключение ValidationError.
         Также проверяем, что сообщение об ошибке содержит ожидаемый текст.
         """
         employee = Employee(
@@ -60,8 +63,10 @@ class EmployeeModelValidationTests(APITestCase):
 
     def test_blank_email(self):
         """
-        Проверяет, что объект Employee с пустым email проходит валидацию, если email не является обязательным полем.
-        Создаем объект Employee с пустым email и проверяем, что вызов full_clean() не вызывает исключение ValidationError.
+        Проверяет, что объект Employee с пустым email проходит валидацию,
+        если email не является обязательным полем.
+        Создаем объект Employee с пустым email и проверяем,
+        что вызов full_clean() не вызывает исключение ValidationError.
         """
         employee = Employee(
             full_name="Иванов Иван",
@@ -76,8 +81,11 @@ class EmployeeModelValidationTests(APITestCase):
 
     def test_null_email(self):
         """
-        Проверяет, что объект Employee с email, равным None, проходит валидацию, если email может быть None.
-        Создаем объект Employee с email, равным None, и проверяем, что вызов full_clean() не вызывает исключение ValidationError.
+        Проверяет, что объект Employee с email, равным None,
+        проходит валидацию, если email может быть None.
+        Создаем объект Employee с email, равным None,
+        и проверяем, что вызов full_clean() не вызывает исключение
+        ValidationError.
         """
         employee = Employee(
             full_name="Иванов Иван",
@@ -118,8 +126,11 @@ class EmployeePermissionsTests(APITestCase):
 
     def test_admin_can_create_employee(self):
         """
-        Проверяет, что администратор может создавать объекты Employee через API.
-        Аутентифицируем администратора, отправляем POST запрос на endpoint создания Employee и проверяем, что статус код ответа равен 201 Created.
+        Проверяет, что администратор может создавать объекты
+        Employee через API.
+        Аутентифицируем администратора, отправляем POST запрос
+        на endpoint создания Employee и проверяем, что статус код
+        ответа равен 201 Created.
         """
         self.client.force_authenticate(user=self.admin_user)
         url = reverse("employee-list")
@@ -134,8 +145,11 @@ class EmployeePermissionsTests(APITestCase):
 
     def test_regular_user_cannot_create_employee(self):
         """
-        Проверяет, что обычный пользователь не может создавать объекты Employee через API.
-        Аутентифицируем обычного пользователя, отправляем POST запрос на endpoint создания Employee и проверяем, что статус код ответа равен 403 Forbidden.
+        Проверяет, что обычный пользователь не может создавать
+        объекты Employee через API.
+        Аутентифицируем обычного пользователя, отправляем POST
+        запрос на endpoint создания Employee и проверяем,
+        что статус код ответа равен 403 Forbidden.
         """
         self.client.force_authenticate(user=self.regular_user)
         url = reverse("employee-list")
@@ -150,8 +164,10 @@ class EmployeePermissionsTests(APITestCase):
 
     def test_regular_user_can_view_employee_list(self):
         """
-        Проверяет, что аутентифицированный пользователь может просматривать список сотрудников.
-        Аутентифицируем обычного пользователя, отправляем GET запрос на endpoint получения списка сотрудников и проверяем,
+        Проверяет, что аутентифицированный пользователь может
+        просматривать список сотрудников.
+        Аутентифицируем обычного пользователя, отправляем GET запрос
+        на endpoint получения списка сотрудников и проверяем,
         что статус код ответа равен 200 OK.
         """
         self.client.force_authenticate(user=self.regular_user)

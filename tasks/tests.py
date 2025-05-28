@@ -6,6 +6,7 @@ from .models import Task, Employee
 from django.utils import timezone
 from datetime import timedelta
 from django.core.exceptions import ValidationError
+from unittest.mock import patch
 
 User = get_user_model()
 
@@ -31,7 +32,8 @@ class TaskModelValidationTests(APITestCase):
     def test_valid_task(self):
         """
         Проверяет, что валидный объект Task проходит валидацию.
-        Создаем объект Task с корректными данными и проверяем, что вызов full_clean() не вызывает исключение ValidationError.
+        Создаем объект Task с корректными данными и проверяем,
+        что вызов full_clean() не вызывает исключение ValidationError.
         """
         deadline = timezone.now().date() + timedelta(days=7)
         task = Task(
@@ -47,8 +49,10 @@ class TaskModelValidationTests(APITestCase):
 
     def test_deadline_in_past(self):
         """
-        Проверяет, что объект Task с дедлайном в прошлом не проходит валидацию.
-        Создаем объект Task с дедлайном в прошлом и проверяем, что вызов full_clean() вызывает исключение ValidationError.
+        Проверяет, что объект Task с дедлайном в прошлом
+        не проходит валидацию.
+        Создаем объект Task с дедлайном в прошлом и проверяем,
+        что вызов full_clean() вызывает исключение ValidationError.
         Также проверяем, что сообщение об ошибке содержит ожидаемый текст.
         """
         deadline = timezone.now().date() - timedelta(days=1)
@@ -64,8 +68,10 @@ class TaskModelValidationTests(APITestCase):
 
     def test_priority_negative(self):
         """
-        Проверяет, что объект Task с отрицательным приоритетом не проходит валидацию.
-        Создаем объект Task с отрицательным приоритетом и проверяем, что вызов full_clean() вызывает исключение ValidationError.
+        Проверяет, что объект Task с отрицательным приоритетом
+        не проходит валидацию.
+        Создаем объект Task с отрицательным приоритетом и проверяем,
+        что вызов full_clean() вызывает исключение ValidationError.
         Также проверяем, что сообщение об ошибке содержит ожидаемый текст.
         """
         deadline = timezone.now().date() + timedelta(days=7)
@@ -82,8 +88,10 @@ class TaskModelValidationTests(APITestCase):
 
     def test_blank_description(self):
         """
-        Проверяет, что объект Task с пустым описанием проходит валидацию, если описание не является обязательным полем.
-        Создаем объект Task с пустым описанием и проверяем, что вызов full_clean() не вызывает исключение ValidationError.
+        Проверяет, что объект Task с пустым описанием проходит валидацию,
+        если описание не является обязательным полем.
+        Создаем объект Task с пустым описанием и проверяем,
+        что вызов full_clean() не вызывает исключение ValidationError.
         """
         deadline = timezone.now().date() + timedelta(days=7)
         task = Task(
@@ -100,8 +108,10 @@ class TaskModelValidationTests(APITestCase):
 
     def test_null_assignee(self):
         """
-        Проверяет, что объект Task с assignee, равным None, проходит валидацию, если assignee может быть None.
-        Создаем объект Task с assignee, равным None, и проверяем, что вызов full_clean() не вызывает исключение ValidationError.
+        Проверяет, что объект Task с assignee, равным None,
+        проходит валидацию, если assignee может быть None.
+        Создаем объект Task с assignee, равным None, и проверяем,
+        что вызов full_clean() не вызывает исключение ValidationError.
         """
         deadline = timezone.now().date() + timedelta(days=7)
         task = Task(
@@ -233,7 +243,8 @@ class TaskPermissionsTests(APITestCase):
     def test_admin_can_get_busy_employees(self):
         """
         Проверяет, что администратор может получить список занятых сотрудников через API.
-        Аутентифицируем администратора, отправляем GET запрос на endpoint получения списка занятых сотрудников и проверяем,
+        Аутентифицируем администратора, отправляем GET запрос на endpoint
+        получения списка занятых сотрудников и проверяем,
         что статус код ответа равен 200 OK.
         """
         self.client.force_authenticate(user=self.admin_user)
@@ -243,8 +254,10 @@ class TaskPermissionsTests(APITestCase):
 
     def test_regular_user_cannot_get_busy_employees(self):
         """
-        Проверяет, что обычный пользователь не может получить список занятых сотрудников через API.
-        Аутентифицируем обычного пользователя, отправляем GET запрос на endpoint получения списка занятых сотрудников и проверяем,
+        Проверяет, что обычный пользователь не может получить список
+        занятых сотрудников через API.
+        Аутентифицируем обычного пользователя, отправляем GET запрос
+        на endpoint получения списка занятых сотрудников и проверяем,
         что статус код ответа равен 403 Forbidden.
         """
         self.client.force_authenticate(user=self.regular_user)
@@ -275,8 +288,10 @@ class TaskPermissionsTests(APITestCase):
 
     def test_regular_user_cannot_get_important_tasks(self):
         """
-        Проверяет, что обычный пользователь не может получить список важных задач через API.
-        Аутентифицируем обычного пользователя, отправляем GET запрос на endpoint получения списка важных задач и проверяем,
+        Проверяет, что обычный пользователь не может получить список
+        важных задач через API.
+        Аутентифицируем обычного пользователя, отправляем GET запрос
+        на endpoint получения списка важных задач и проверяем,
         что статус код ответа равен 403 Forbidden.
         """
         self.client.force_authenticate(user=self.regular_user)
@@ -410,9 +425,6 @@ class TaskLoggingTests(APITestCase):
             self.assertIn("Getting important tasks", cm.output[0])
 
 
-from unittest.mock import patch
-
-
 class CeleryTasksTests(APITestCase):
     """
     Этот класс содержит тесты для проверки работы асинхронных задач Celery.
@@ -454,6 +466,8 @@ class CeleryTasksTests(APITestCase):
             priority=9,
             creator=self.admin_user,
         )  # Эта задача зависит от задачи 1
+
+        self.assertEqual(task2.name, "Задача 2")
 
         # Вызываем Celery задачу
         from .tasks import calculate_important_tasks
@@ -510,7 +524,9 @@ class TaskFilteringAndSearchTests(APITestCase):
     def test_filter_by_assignee(self):
         """
         Проверяет фильтрацию задач по assignee.
-        Создаем несколько задач, назначенных разным сотрудникам, и проверяем, что при фильтрации по определенному assignee возвращаются только задачи, назначенные этому сотруднику.
+        Создаем несколько задач, назначенных разным сотрудникам,
+        и проверяем, что при фильтрации по определенному assignee
+        возвращаются только задачи, назначенные этому сотруднику.
         """
         employee2 = Employee.objects.create(
             full_name="Петров Петр", position="Менеджер", user=self.admin_user
@@ -537,7 +553,9 @@ class TaskFilteringAndSearchTests(APITestCase):
     def test_filter_by_status(self):
         """
         Проверяет фильтрацию задач по статусу.
-        Создаем несколько задач с разными статусами и проверяем, что при фильтрации по определенному статусу возвращаются только задачи с этим статусом.
+        Создаем несколько задач с разными статусами и проверяем,
+        что при фильтрации по определенному статусу возвращаются
+        только задачи с этим статусом.
         """
         Task.objects.create(
             name="Задача 1",
@@ -561,13 +579,15 @@ class TaskFilteringAndSearchTests(APITestCase):
         )  # Используем queryset.count()
         if response.data:  # Проверка если пусто
             self.assertEqual(
-                response.data[0]["name"], "Задача 1"
-            ) # Проверка, существуют ли данные перед извлечением
+                response.data[0]["name"],
+                "Задача 1"
+            )  # Проверка, существуют ли данные перед извлечением
 
     def test_ordering_by_deadline(self):
         """
         Проверяет сортировку задач по дедлайну.
-        Создаем несколько задач с разными дедлайнами и проверяем, что при сортировке по дедлайну задачи возвращаются в правильном порядке.
+        Создаем несколько задач с разными дедлайнами и проверяем,
+        что при сортировке по дедлайну задачи возвращаются в правильном порядке.
         """
         Task.objects.create(
             name="Задача 1",
@@ -594,7 +614,9 @@ class TaskFilteringAndSearchTests(APITestCase):
     def test_search_by_name(self):
         """
         Проверяет поиск задач по имени.
-        Создаем несколько задач с разными именами и проверяем, что при поиске по определенному имени возвращаются только задачи, содержащие это имя.
+        Создаем несколько задач с разными именами и проверяем,
+        что при поиске по определенному имени возвращаются только задачи,
+        содержащие это имя.
         """
         Task.objects.create(
             name="Тестовая задача 1",
@@ -641,6 +663,8 @@ class TaskFilteringAndSearchTests(APITestCase):
             deadline=timezone.now().date() + timedelta(days=14),
             creator=regular_user,
         )
+        self.assertEqual(task1.name, "Задача 1")
+        self.assertEqual(task2.name, "Задача 2")
 
         url = reverse("task-list") + f"?username={self.admin_user.email}"
         response = self.client.get(url)
