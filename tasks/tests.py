@@ -1,12 +1,13 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from django.contrib.auth import get_user_model
 from .models import Task, Employee
 from django.utils import timezone
 from datetime import timedelta
 from django.core.exceptions import ValidationError
 from unittest.mock import patch
+import time
 
 User = get_user_model()
 
@@ -483,194 +484,142 @@ class CeleryTasksTests(APITestCase):
     def test_important_tasks_view_calls_celery_task(self):
         """
         Проверяет, что представление ImportantTasksView вызывает задачу Celery calculate_important_tasks.
-        Используем mock для замены задачи Celery и проверяем, что она была вызвана.
         """
+        client = APIClient()
+        client.force_authenticate(user=self.admin_user)  # Аутентифицируем администратора
 
-        # Mock Celery task
-        with patch("tasks.tasks.calculate_important_tasks.delay") as mocked_task:
-            # Делаем запрос на просмотр
-            self.client.force_authenticate(user=self.admin_user)
-            url = reverse("important_tasks")
-            response = self.client.get(url)
-
+        with patch("tasks.tasks.calculate_important_tasks") as mock_task:
+            response = client.get("/api/important_tasks/")
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            mocked_task.assert_called_once()
+            mock_task.assert_called_once()
 
 
 class TaskFilteringAndSearchTests(APITestCase):
-    """
-    Этот класс содержит тесты для проверки фильтрации и поиска задач через API.
-    Проверяем, что фильтрация по статусу, assignee, поиск по имени и сортировка работают правильно.
-    """
-
     def setUp(self):
         """
         Метод setUp() вызывается перед каждым тестом.
-        Здесь мы создаем тестового пользователя (администратора) и объект Employee.
+        Здесь мы создаем тестового пользователя (администратора), объект Employee и объект Task.
         """
-        # Очищаем данные перед тестом
-        Task.objects.all().delete()
-        Employee.objects.all().delete()
-        User.objects.exclude(is_superuser=True).delete()
-
         self.admin_user = User.objects.create_superuser(
             email="admin@example.com", password="password"
         )
         self.employee = Employee.objects.create(
             full_name="Иванов Иван", position="Разработчик", user=self.admin_user
         )
+        self.employee2 = Employee.objects.create(
+            full_name="Олег Савченко", position="Менеджер", user=self.admin_user
+        )
+        self.task = Task.objects.create(
+            name="Тестовая задача",
+            assignee=self.employee,
+            creator=self.admin_user,
+        )
         self.client.force_authenticate(user=self.admin_user)
 
     def test_filter_by_assignee(self):
-        """
-        Проверяет фильтрацию задач по assignee.
-        Создаем несколько задач, назначенных разным сотрудникам,
-        и проверяем, что при фильтрации по определенному assignee
-        возвращаются только задачи, назначенные этому сотруднику.
-        """
-        employee2 = Employee.objects.create(
-            full_name="Петров Петр", position="Менеджер", user=self.admin_user
-        )
-        Task.objects.create(
-            name="Задача 1",
-            assignee=self.employee,
-            deadline=timezone.now().date() + timedelta(days=7),
-            creator=self.admin_user,
-        )
-        Task.objects.create(
-            name="Задача 2",
-            assignee=employee2,
-            deadline=timezone.now().date() + timedelta(days=14),
-            creator=self.admin_user,
-        )
-        url = reverse("task-list") + f"?assignee={self.employee.id}"
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Task.objects.filter(assignee=self.employee).count(), 1)
-        if response.data:
-            self.assertEqual(response.data[0]["name"], "Задача 1")
+        """Проверяет фильтрацию задач по assignee."""
+        client = APIClient()
+        client.force_authenticate(user=self.admin_user)
+        Task.objects.all().delete()
+        task1 = Task.objects.create(name="Задача 1", assignee=self.employee, status="new")
+        task2 = Task.objects.create(name="Задача 2", assignee=self.employee2, status="in_progress")
+        task3 = Task.objects.create(name="Задача 3", assignee=self.employee, status="completed")
+        task4 = Task.objects.create(name="Задача 4", assignee=self.employee2, status="new")
+        self.assertEqual(task1.name, "Задача 1")
+        self.assertEqual(task2.name, "Задача 2")
+        self.assertEqual(task3.name, "Задача 3")
+        self.assertEqual(task4.name, "Задача 4")
 
-    def test_filter_by_status(self):
-        """
-        Проверяет фильтрацию задач по статусу.
-        Создаем несколько задач с разными статусами и проверяем,
-        что при фильтрации по определенному статусу возвращаются
-        только задачи с этим статусом.
-        """
-        Task.objects.create(
-            name="Задача 1",
-            assignee=self.employee,
-            deadline=timezone.now().date() + timedelta(days=7),
-            status="new",
-            creator=self.admin_user,
-        )
-        Task.objects.create(
-            name="Задача 2",
-            assignee=self.employee,
-            deadline=timezone.now().date() + timedelta(days=14),
-            status="in_progress",
-            creator=self.admin_user,
-        )
-        url = reverse("task-list") + "?status=new"
-        response = self.client.get(url)
+        response = client.get(f"/api/tasks/?assignee={self.employee.pk}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            Task.objects.filter(status="new").count(), 1
-        )  # Используем queryset.count()
-        if response.data:  # Проверка если пусто
-            self.assertEqual(
-                response.data[0]["name"],
-                "Задача 1"
-            )  # Проверка, существуют ли данные перед извлечением
+        print(f"Response data: {response.data}")
+        print(f"Expected assignee: {self.employee.pk}")
 
-    def test_ordering_by_deadline(self):
-        """
-        Проверяет сортировку задач по дедлайну.
-        Создаем несколько задач с разными дедлайнами и проверяем,
-        что при сортировке по дедлайну задачи возвращаются в правильном порядке.
-        """
-        Task.objects.create(
-            name="Задача 1",
-            assignee=self.employee,
-            deadline=timezone.now().date() + timedelta(days=14),
-            creator=self.admin_user,
-        )
-        Task.objects.create(
-            name="Задача 2",
-            assignee=self.employee,
-            deadline=timezone.now().date() + timedelta(days=7),
-            creator=self.admin_user,
-        )
-        url = reverse("task-list") + "?ordering=deadline"
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # self.assertEqual(len(response.data), 2)
-        self.assertEqual(Task.objects.count(), 2)
-        if response.data:
-            self.assertEqual(
-                response.data[0]["name"], "Задача 2"
-            )  # Earlier deadline first
+        results = response.data['results']
+        self.assertEqual(len(results), 2)  # Должно быть 2 задачи
 
-    def test_search_by_name(self):
-        """
-        Проверяет поиск задач по имени.
-        Создаем несколько задач с разными именами и проверяем,
-        что при поиске по определенному имени возвращаются только задачи,
-        содержащие это имя.
-        """
-        Task.objects.create(
-            name="Тестовая задача 1",
-            assignee=self.employee,
-            deadline=timezone.now().date() + timedelta(days=7),
-            creator=self.admin_user,
-        )
-        Task.objects.create(
-            name="Другая задача",
-            assignee=self.employee,
-            deadline=timezone.now().date() + timedelta(days=14),
-            creator=self.admin_user,
-        )
-        url = reverse("task-list") + "?search=Тестовая"
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Task.objects.filter(name__icontains="Тестовая").count(), 1)
-        # self.assertEqual(len(response.data), 1)
-        if response.data:
-            self.assertEqual(response.data[0]["name"], "Тестовая задача 1")
+        for task in results:
+            print(f"Task assignee: {task['assignee']}")
+            self.assertEqual(task["assignee"], self.employee.pk)
 
     def test_filter_by_creator(self):
-        """
-        Проверяет фильтрацию задач по создателю.
-        Создаем несколько задач, созданных разными пользователями и проверяем,
-        что при фильтрации по определенному создателю возвращаются только задачи, созданные этим пользователем.
-        """
-        regular_user = User.objects.create_user(
-            email="regular@example.com", password="password"
-        )
-        employee2 = Employee.objects.create(
-            full_name="Петров Петр", position="Менеджер", user=regular_user
-        )
+        """Проверяет фильтрацию задач по создателю."""
+        client = APIClient()
+        client.force_authenticate(user=self.admin_user)
+        Task.objects.all().delete()
+        task1 = Task.objects.create(name="Задача 1", creator=self.admin_user,
+                                    status="new")
+        task2 = Task.objects.create(name="Задача 2", creator=self.admin_user,
+                                    status="in_progress")
+        self.assertEqual(task1.name, "Задача 1")
+        self.assertEqual(task2.name, "Задача 2")
+        response = client.get(f"/api/tasks/?creator={self.admin_user.pk}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print(f"Response data: {response.data}")
+        time.sleep(1)  # Добавьте задержку в 1 секунду
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]["name"], "Задача 1")
 
-        task1 = Task.objects.create(
-            name="Задача 1",
-            assignee=self.employee,
-            deadline=timezone.now().date() + timedelta(days=7),
-            creator=self.admin_user,
-        )
-        task2 = Task.objects.create(
-            name="Задача 2",
-            assignee=employee2,
-            deadline=timezone.now().date() + timedelta(days=14),
-            creator=regular_user,
-        )
+    def test_filter_by_status(self):
+        """Проверяет фильтрацию задач по статусу."""
+        client = APIClient()
+        client.force_authenticate(user=self.admin_user)
+        Task.objects.all().delete()
+        task1 = Task.objects.create(name="Задача 1", status="new")
+        task2 = Task.objects.create(name="Задача 2", status="in_progress")
         self.assertEqual(task1.name, "Задача 1")
         self.assertEqual(task2.name, "Задача 2")
 
-        url = reverse("task-list") + f"?username={self.admin_user.email}"
-        response = self.client.get(url)
+        response = client.get(f'{"/api/tasks/?status=new"}')
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            Task.objects.filter(creator__email=self.admin_user.email).count(), 1
-        )
-        if response.data:
-            self.assertEqual(response.data[0]["name"], "Задача 1")
+        print(f"Response data: {response.data}")
+        for task in response.data['results']:
+            print(f"Task status: {task['status']}")
+
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]["name"], "Задача 1")
+
+    def test_ordering_by_deadline(self):
+        """Проверяет сортировку задач по дедлайну."""
+        client = APIClient()
+        client.force_authenticate(user=self.admin_user)
+        Task.objects.all().delete()
+        # Создаем задачи с разными дедлайнами
+        task1 = Task.objects.create(name="Задача 1", status="new", deadline=timezone.now().date() + timedelta(days=2))
+        task2 = Task.objects.create(name="Задача 2", status="new", deadline=timezone.now().date())
+        task3 = Task.objects.create(name="Задача 3", status="new",
+                                    deadline=timezone.now().date() + timedelta(days=1))
+
+        self.assertEqual(task1.name, "Задача 1")
+        self.assertEqual(task2.name, "Задача 2")
+        self.assertEqual(task3.name, "Задача 3")
+        response = client.get(f'{"/api/tasks/?ordering=deadline"}')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        results = response.data['results']
+        self.assertEqual(len(results), 3)
+
+        self.assertEqual(results[0]["name"], "Задача 2")  # Самый ранний deadline
+        self.assertEqual(results[1]["name"], "Задача 3")  # Второй по раннему deadline
+        self.assertEqual(results[2]["name"], "Задача 1")  # Самый поздний deadline
+
+    def test_search_by_name(self):
+        """Проверяет поиск задач по имени."""
+        client = APIClient()
+        client.force_authenticate(user=self.admin_user)
+        task1 = Task.objects.create(name="Задача 1", status="new", deadline=timezone.now().date())
+        task2 = Task.objects.create(name="Задача 2", status="in_progress", deadline=timezone.now().date())
+        self.assertEqual(task1.name, "Задача 1")
+        self.assertEqual(task2.name, "Задача 2")
+
+        response = client.get(f'{"/api/tasks/?search=Задача 1"}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        print(f"Response data: {response.data}")
+
+        if len(response.data['results']) > 0:
+            self.assertEqual(response.data['results'][0]["name"], "Задача 1")
+        else:
+            self.fail("No results found for search query 'Задача 1'")

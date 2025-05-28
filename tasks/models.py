@@ -38,7 +38,9 @@ class Task(models.Model):
         help_text="Выберите сотрудника, которому назначена задача",
     )
     deadline = models.DateField(
-        verbose_name="Срок", help_text="Укажите срок выполнения задачи"
+        verbose_name="Срок",
+        help_text="Укажите срок выполнения задачи",
+        default=timezone.now().date(),
     )
     priority = models.IntegerField(
         default=5, verbose_name="Приоритет", help_text="Укажите приоритет задачи"

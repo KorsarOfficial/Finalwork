@@ -1,5 +1,5 @@
 import logging
-from rest_framework import viewsets, permissions, generics
+from rest_framework import viewsets, permissions, generics, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Task, Employee
@@ -105,6 +105,12 @@ class TaskViewSet(viewsets.ModelViewSet):
             {"status": "task completed"}
         )  # Возвращаем ответ с информацией о завершении задачи
 
+    def destroy(self, request, *args, **kwargs):
+        task = self.get_object()
+        logger.info(f"Deleting task {task.pk}")
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def get_queryset(self):
         """
         Опционально ограничивает возвращаемые задачи для заданного пользователя.
@@ -158,7 +164,6 @@ class BusyEmployeesView(generics.ListAPIView):
 class ImportantTasksView(generics.ListAPIView):
     """
     API endpoint для получения списка важных задач.
-    Важными считаются задачи с высоким приоритетом и сроком выполнения менее 7 дней.
     """
 
     serializer_class = (
@@ -170,19 +175,10 @@ class ImportantTasksView(generics.ListAPIView):
 
     def get_queryset(self):
         """
-        Определяет, какие задачи считаются важными.
-        Фильтруем задачи по приоритету и сроку выполнения.
+        Возвращает результат Celery задачи calculate_important_tasks.
         """
         logger.info("Getting important tasks")  # Добавляем логирование
-        # Логика для определения важных задач
-        # Пример: задачи с высоким приоритетом и сроком выполнения менее 7 дней
-        important_tasks = (
-            Task.objects.filter(  # Фильтруем задачи
-                ~Q(status="new"),  # Исключаем новые задачи
-                parent_task__status="new",  # У которых есть родительская задача в статусе "новая"
-            )
-            .order_by("-priority", "deadline")
-            .distinct()
-        )  # Фильтруем задачи
+        from .tasks import calculate_important_tasks
 
-        return important_tasks  # Возвращаем список важных задач
+        result = calculate_important_tasks()  # Вызываем Celery задачу
+        return result

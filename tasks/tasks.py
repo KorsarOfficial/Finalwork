@@ -37,80 +37,40 @@ def calculate_important_tasks():
 
     result = []  # Создаем пустой список для результатов
 
-    for task in important_tasks:  # Перебираем важные задачи
+    for task in important_tasks:
         least_loaded_employee = (  # Находим наименее загруженного сотрудника
             Employee.objects.annotate(  # Добавляем аннотацию num_tasks к каждому сотруднику
                 num_tasks=Count(  # Подсчитываем количество задач
-                    "tasks",  # Связанных с сотрудником через поле 'tasks'
-                    filter=Q(
-                        tasks__status__in=["new", "in_progress"]
-                    ),  # Фильтруем задачи по статусу
+                    "tasks", filter=Q(tasks__status__in=["new", "in_progress"])
+                    # Связанных с сотрудником через поле 'tasks'
+                    # Фильтруем задачи по статусу
                 )
             )
-            .order_by(
-                "num_tasks"
-            )  # Сортируем сотрудников по количеству задач (по возрастанию)
+            .order_by("num_tasks")  # Сортируем сотрудников по количеству задач (по возрастанию)
             .first()  # Берем первого сотрудника (с наименьшим количеством задач)
         )
 
-        if (
-            not least_loaded_employee
-        ):  # Если наименее загруженный сотрудник не найден (нет сотрудников)
-            available_employees = Employee.objects.all()  # Получаем всех сотрудников
-            if available_employees.count() == 0:  # Если сотрудников нет
-                available_employee_name = (
-                    "Сотрудников нет"  # Сообщаем, что сотрудников нет
-                )
-            else:  # Если сотрудники есть
-                available_employee = (
-                    available_employees.first()
-                )  # Берем первого попавшегося сотрудника
-                available_employee_name = (
-                    available_employee.full_name
-                )  # Получаем его имя
+        if not least_loaded_employee:  # Если наименее загруженный сотрудник не найден (нет сотрудников)
+            available_employees = Employee.objects.all()
+            if available_employees.count() == 0:
+                result.append({"task_name": task.name, "deadline": task.deadline, "employee": "Сотрудников нет"})
+            else:
+                available_employee = available_employees.first()  # Берем первого попавшегося сотрудника
+                result.append(
+                    {"task_name": task.name, "deadline": task.deadline, "employee": available_employee.full_name})
+            continue
 
-            result.append(  # Добавляем информацию о задаче и отсутствии сотрудника в список результатов
-                {
-                    "task_name": task.name,
-                    "deadline": task.deadline,
-                    "employee": available_employee_name,
-                    # Имя сотрудника ("Сотрудников нет" или
-                    # имя первого попавшегося сотрудника)
-                }
-            )
-            continue  # Переходим к следующей задаче
+        assignee = least_loaded_employee
 
-        parent_task_assignee = None  # Инициализируем переменную для хранения ответственного за родительскую задачу
-        if task.parent_task:  # Если у задачи есть родительская задача
-            parent_task_assignee = (
-                task.parent_task.assignee
-            )  # Получаем ответственного за родительскую задачу
+        if task.parent_task and task.parent_task.assignee:  # Если есть ответственный за родительскую задачу
+            parent_task_assignee = task.parent_task.assignee
 
-        assignee = least_loaded_employee  # Изначально назначаем задачу наименее загруженному сотруднику
-        if (
-            parent_task_assignee
-            and (  # Если есть ответственный за родительскую задачу и
-                parent_task_assignee.tasks.filter(
-                    status__in=["new", "in_progress"]
-                ).count()  # Количество задач у ответственного за родительскую задачу
-                <= least_loaded_employee.tasks.filter(  # Меньше или равно
-                    status__in=[
-                        "new",
-                        "in_progress",
-                    ]  # Количество задач у наименее загруженного сотрудника
-                ).count()
-                + 2  # Плюс 2 (небольшая погрешность)
-            )
-        ):
-            assignee = parent_task_assignee  # Назначаем задачу ответственному за родительскую задачу
-        elif not parent_task_assignee:  # Если нет ответственного за родительскую задачу
-            assignee = least_loaded_employee  # Назначаем задачу наименее загруженному сотруднику
+            if (
+                    parent_task_assignee.tasks.filter(status__in=["new", "in_progress"]).count()
+                    <= least_loaded_employee.tasks.filter(status__in=["new", "in_progress"]).count() + 2
+            ):
+                assignee = parent_task_assignee  # Назначаем задачу ответственному за родительскую задачу
 
-        result.append(  # Добавляем информацию о задаче и назначенном сотруднике в список результатов
-            {
-                "task_name": task.name,  # Имя задачи
-                "deadline": task.deadline,  # Срок выполнения
-                "employee": assignee.full_name,  # Имя назначенного сотрудника
-            }
-        )
-    return result  # Возвращаем список результатов
+        result.append({"task_name": task.name, "deadline": task.deadline, "employee": assignee.full_name})
+
+    return result
