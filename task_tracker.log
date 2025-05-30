@@ -3538,3 +3538,108 @@ WARNING 2025-05-29 02:18:48,103 log 29204 12080 Forbidden: /api/important_tasks/
 WARNING 2025-05-29 02:18:49,454 log 29204 12080 Forbidden: /api/tasks/38/
 WARNING 2025-05-29 02:18:50,769 log 29204 12080 Unauthorized: /api/busy_employees/
 WARNING 2025-05-29 02:18:52,191 log 29204 12080 Unauthorized: /api/important_tasks/
+INFO 2025-05-29 02:37:44,828 autoreload 25912 23768 Watching for file changes with StatReloader
+WARNING 2025-05-29 02:37:47,632 log 25912 26108 Not Found: /
+WARNING 2025-05-29 02:37:47,633 basehttp 25912 26108 "GET / HTTP/1.1" 404 3671
+WARNING 2025-05-29 02:37:51,448 log 25912 26108 Not Found: /tasks
+WARNING 2025-05-29 02:37:51,450 basehttp 25912 26108 "GET /tasks HTTP/1.1" 404 3704
+WARNING 2025-05-29 02:37:51,661 log 25912 26108 Not Found: /tasks
+WARNING 2025-05-29 02:37:51,662 basehttp 25912 26108 "GET /tasks HTTP/1.1" 404 3704
+WARNING 2025-05-29 02:37:57,654 log 25912 26108 Unauthorized: /api/tasks/
+WARNING 2025-05-29 02:37:57,654 basehttp 25912 26108 "GET /api/tasks/ HTTP/1.1" 401 5172
+WARNING 2025-05-29 02:37:57,947 log 25912 26108 Unauthorized: /api/tasks/
+WARNING 2025-05-29 02:37:57,948 basehttp 25912 26108 "GET /api/tasks/ HTTP/1.1" 401 5172
+WARNING 2025-05-29 02:38:27,491 log 25912 26108 Unauthorized: /api/tasks/
+WARNING 2025-05-29 02:38:27,493 basehttp 25912 26108 "GET /api/tasks/?format=api HTTP/1.1" 401 5216
+WARNING 2025-05-29 02:38:32,835 log 25912 26108 Unauthorized: /api/tasks/
+WARNING 2025-05-29 02:38:32,836 basehttp 25912 26108 "GET /api/tasks/ HTTP/1.1" 401 5172
+INFO 2025-05-29 02:38:34,145 basehttp 25912 26108 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-05-29 02:38:34,301 basehttp 25912 26108 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4353
+INFO 2025-05-29 02:38:35,091 basehttp 25912 26108 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-05-29 02:38:35,100 basehttp 25912 26108 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4353
+INFO 2025-05-29 02:43:43,424 autoreload 28476 30348 Watching for file changes with StatReloader
+INFO 2025-05-29 02:43:50,748 basehttp 28476 30620 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-05-29 02:43:50,928 basehttp 28476 30620 "GET /admin/ HTTP/1.1" 200 11344
+INFO 2025-05-29 02:43:50,960 basehttp 28476 30620 "GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+INFO 2025-05-29 02:43:50,970 basehttp 28476 30304 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:43:50,970 basehttp 28476 30620 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:12,304 autoreload 28476 30348 C:\Users\05bat\PycharmProjects\Finalwork\tasks\admin.py changed, reloading.
+INFO 2025-05-29 02:46:13,942 autoreload 24312 4348 Watching for file changes with StatReloader
+INFO 2025-05-29 02:46:15,662 basehttp 24312 23884 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-05-29 02:46:15,790 basehttp 24312 23884 "GET /admin/ HTTP/1.1" 200 13548
+INFO 2025-05-29 02:46:21,552 basehttp 24312 23884 "GET /admin/employees/employee/add/ HTTP/1.1" 200 18418
+INFO 2025-05-29 02:46:21,607 basehttp 24312 23884 "GET /static/admin/css/forms.css HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,608 basehttp 24312 5032 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,611 basehttp 24312 11400 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,614 basehttp 24312 23884 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,615 basehttp 24312 30280 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,615 basehttp 24312 27064 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,616 basehttp 24312 5032 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,698 basehttp 24312 23884 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,698 basehttp 24312 11400 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,699 basehttp 24312 27064 "GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,699 basehttp 24312 5032 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,720 basehttp 24312 25108 "GET /admin/jsi18n/ HTTP/1.1" 200 17546
+INFO 2025-05-29 02:46:21,815 basehttp 24312 25108 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:21,815 basehttp 24312 5032 "GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:35,932 basehttp 24312 5032 "GET /admin/users/user/add/?_to_field=id&_popup=1 HTTP/1.1" 200 21774
+INFO 2025-05-29 02:46:35,970 basehttp 24312 25108 "GET /static/admin/js/calendar.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:35,970 basehttp 24312 27064 "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:36,036 basehttp 24312 5032 "GET /admin/jsi18n/ HTTP/1.1" 200 17546
+INFO 2025-05-29 02:46:36,101 basehttp 24312 5032 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:36,103 basehttp 24312 27064 "GET /static/admin/img/icon-clock.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:48,328 basehttp 24312 27064 "GET /admin/auth/group/add/?_to_field=id&_popup=1 HTTP/1.1" 200 11790
+INFO 2025-05-29 02:46:48,365 basehttp 24312 5032 "GET /static/admin/js/SelectBox.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:48,365 basehttp 24312 25108 "GET /static/admin/js/SelectFilter2.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:48,434 basehttp 24312 27064 "GET /admin/jsi18n/ HTTP/1.1" 200 17546
+INFO 2025-05-29 02:46:48,465 basehttp 24312 25108 "GET /static/admin/img/selector-icons.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:48,465 basehttp 24312 27064 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:46:58,927 basehttp 24312 27064 "POST /admin/auth/group/add/?_to_field=id&_popup=1 HTTP/1.1" 200 439
+INFO 2025-05-29 02:46:59,010 basehttp 24312 27064 "GET /static/admin/js/popup_response.js HTTP/1.1" 200 532
+INFO 2025-05-29 02:47:19,721 basehttp 24312 27064 "POST /admin/users/user/add/?_to_field=id&_popup=1 HTTP/1.1" 200 373
+INFO 2025-05-29 02:47:24,702 basehttp 24312 27064 "POST /admin/employees/employee/add/ HTTP/1.1" 302 0
+INFO 2025-05-29 02:47:24,862 basehttp 24312 27064 "GET /admin/employees/employee/ HTTP/1.1" 200 16027
+INFO 2025-05-29 02:47:24,905 basehttp 24312 27064 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-05-29 02:47:24,919 basehttp 24312 27064 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-05-29 02:47:24,975 basehttp 24312 25108 "GET /admin/jsi18n/ HTTP/1.1" 200 17546
+INFO 2025-05-29 02:47:24,997 basehttp 24312 25108 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:47:24,997 basehttp 24312 27064 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+INFO 2025-05-29 02:47:27,252 basehttp 24312 27064 "GET /admin/tasks/task/ HTTP/1.1" 200 13474
+INFO 2025-05-29 02:47:27,339 basehttp 24312 27064 "GET /admin/jsi18n/ HTTP/1.1" 200 17546
+INFO 2025-05-29 02:47:29,476 basehttp 24312 27064 "GET /admin/tasks/task/add/ HTTP/1.1" 200 28621
+INFO 2025-05-29 02:47:29,585 basehttp 24312 25108 "GET /static/admin/img/icon-deletelink.svg HTTP/1.1" 200 392
+INFO 2025-05-29 02:47:29,632 basehttp 24312 27064 "GET /admin/jsi18n/ HTTP/1.1" 200 17546
+INFO 2025-05-29 02:48:04,450 basehttp 24312 27064 "POST /admin/tasks/task/add/ HTTP/1.1" 302 0
+INFO 2025-05-29 02:48:04,531 basehttp 24312 27064 "GET /admin/tasks/task/ HTTP/1.1" 200 15670
+INFO 2025-05-29 02:48:04,623 basehttp 24312 27064 "GET /admin/jsi18n/ HTTP/1.1" 200 17546
+INFO 2025-05-29 02:48:13,841 basehttp 24312 27064 "GET /admin/tasks/task/ HTTP/1.1" 200 15444
+INFO 2025-05-29 02:48:13,936 basehttp 24312 27064 "GET /admin/jsi18n/ HTTP/1.1" 200 17546
+INFO 2025-05-29 02:48:16,469 basehttp 24312 27064 "GET /admin/tasks/task/ HTTP/1.1" 200 15444
+INFO 2025-05-29 02:48:19,626 basehttp 24312 27064 "GET /admin/ HTTP/1.1" 200 15112
+WARNING 2025-05-29 02:48:21,643 log 24312 27064 Not Found: /tasks
+WARNING 2025-05-29 02:48:21,644 basehttp 24312 27064 "GET /tasks HTTP/1.1" 404 3704
+WARNING 2025-05-29 02:48:21,943 log 24312 27064 Not Found: /tasks
+WARNING 2025-05-29 02:48:21,945 basehttp 24312 27064 "GET /tasks HTTP/1.1" 404 3704
+INFO 2025-05-29 02:48:26,716 basehttp 24312 27064 "GET /api/tasks/ HTTP/1.1" 200 14963
+INFO 2025-05-29 02:48:26,967 basehttp 24312 27064 "GET /static/rest_framework/fonts/glyphicons-halflings-regular.woff2 HTTP/1.1" 304 0
+INFO 2025-05-29 02:48:34,163 basehttp 24312 27064 "GET /api/tasks/ HTTP/1.1" 200 14963
+INFO 2025-05-29 02:48:36,933 basehttp 24312 27064 "GET /api/employees/ HTTP/1.1" 200 11330
+INFO 2025-05-29 02:49:33,412 basehttp 24312 27064 "POST /api/employees/ HTTP/1.1" 201 11083
+INFO 2025-05-29 02:49:57,493 basehttp 24312 27064 "GET /api/employees/ HTTP/1.1" 200 12525
+INFO 2025-05-29 02:50:18,579 basehttp 24312 27064 "GET /api/employees/ HTTP/1.1" 200 12525
+INFO 2025-05-29 02:50:24,379 basehttp 24312 27064 "GET /api/tasks/ HTTP/1.1" 200 15119
+WARNING 2025-05-29 02:51:15,713 log 24312 27064 Bad Request: /api/tasks/
+WARNING 2025-05-29 02:51:15,713 basehttp 24312 27064 "POST /api/tasks/ HTTP/1.1" 400 5299
+INFO 2025-05-29 02:51:40,017 basehttp 24312 26332 "GET /api/tasks/ HTTP/1.1" 200 15119
+WARNING 2025-05-29 02:52:30,857 log 24312 26332 Bad Request: /api/tasks/
+WARNING 2025-05-29 02:52:30,858 basehttp 24312 26332 "POST /api/tasks/ HTTP/1.1" 400 5317
+INFO 2025-05-29 02:52:45,603 basehttp 24312 26332 "GET /api/tasks/ HTTP/1.1" 200 15119
+INFO 2025-05-29 02:53:31,091 basehttp 24312 26332 "POST /api/tasks/ HTTP/1.1" 201 12243
+INFO 2025-05-29 02:53:34,703 basehttp 24312 26332 "GET /api/tasks/ HTTP/1.1" 200 15685
+INFO 2025-05-29 02:53:55,376 basehttp 24312 26332 "GET /api/tasks/ HTTP/1.1" 200 15685
+INFO 2025-05-29 02:53:56,582 basehttp 24312 26332 "GET /api/employees/ HTTP/1.1" 200 12525
+WARNING 2025-05-29 02:53:58,228 log 24312 26332 Not Found: /api/em
+WARNING 2025-05-29 02:53:58,230 basehttp 24312 26332 "GET /api/em HTTP/1.1" 404 7072
+INFO 2025-05-29 02:54:01,508 basehttp 24312 26332 "GET /api/employees/ HTTP/1.1" 200 12525
+INFO 2025-05-29 02:54:11,927 basehttp 24312 26332 "GET /api/employees/ HTTP/1.1" 200 12525
+INFO 2025-05-29 02:54:14,617 basehttp 24312 26332 "GET /api/tasks/ HTTP/1.1" 200 15685
